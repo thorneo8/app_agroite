@@ -1,0 +1,16 @@
+name: app_riego
+description: A new Flutter project.
+
+environment:
+  sdk: '^3.7.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  flutter_lints: ^5.0.0
+  # ...otros paquetes si tienes
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

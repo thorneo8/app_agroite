@@ -1,6 +1,6 @@
-// lib/screens/company_dashboard_screen.dart
-
 import 'package:flutter/material.dart';
+import 'manage_technicians_screen.dart';
+//import 'manage_clients_screen.dart';
 
 class CompanyDashboardScreen extends StatelessWidget {
   const CompanyDashboardScreen({super.key});
@@ -9,40 +9,39 @@ class CompanyDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Panel de la Empresa'),
+        title: const Text('Panel de Empresa'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'Bienvenido a la gestión de su empresa',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 30),
+            const SizedBox(height: 20),
             ElevatedButton.icon(
-              icon: Icon(Icons.group),
-              label: Text('Gestionar Técnicos'),
+              icon: const Icon(Icons.engineering),
+              label: const Text('Gestionar Técnicos'),
               onPressed: () {
-                // Aquí iremos a la pantalla de técnicos
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ManageTechniciansScreen(),
+                  ),
+                );
               },
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
-              ),
             ),
-            SizedBox(height: 20),
-            ElevatedButton.icon(
-              icon: Icon(Icons.people),
-              label: Text('Gestionar Clientes'),
-              onPressed: () {
-                // Aquí iremos a la pantalla de clientes
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
-              ),
-            ),
+            const SizedBox(height: 20),
+            //ElevatedButton.icon(
+              //icon: const Icon(Icons.people),
+              //label: const Text('Gestionar Clientes'),
+              //onPressed: () {
+                //Navigator.push(
+                  //context,
+                  //MaterialPageRoute(
+                    //builder: (_) => const ManageClientsScreen(),
+                  //),
+                //);
+              //},
+            //),
           ],
         ),
       ),

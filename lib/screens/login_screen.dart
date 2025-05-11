@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'company_dashboard_screen.dart';
 import 'create_password_screen.dart';
+import 'technician_dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -55,7 +56,6 @@ class LoginScreenState extends State<LoginScreen> {
                     final empresasBox = Hive.box('empresas');
                     final tecnicosBox = Hive.box('tecnicos');
 
-                    // Buscar si es empresa
                     final empresa = empresasBox.values.firstWhere(
                       (e) => e['email'] == email && e['password'] == password,
                       orElse: () => null,
@@ -71,7 +71,6 @@ class LoginScreenState extends State<LoginScreen> {
                       return;
                     }
 
-                    // Buscar si es técnico
                     final tecnico = tecnicosBox.values.firstWhere(
                       (t) => t['email'] == email,
                       orElse: () => null,
@@ -96,8 +95,12 @@ class LoginScreenState extends State<LoginScreen> {
                       }
 
                       if (tecnico['password'] == password) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Login técnico exitoso (falta redirigir a panel)')),
+                        // Redirige al dashboard del técnico
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const TechnicianDashboardScreen(),
+                          ),
                         );
                         return;
                       }
@@ -109,6 +112,38 @@ class LoginScreenState extends State<LoginScreen> {
                   }
                 },
                 child: const Text('Entrar'),
+              ),
+              const SizedBox(height: 10),
+              TextButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+
+                    final tecnicosBox = Hive.box('tecnicos');
+                    final tecnico = tecnicosBox.values.firstWhere(
+                      (t) => t['email'] == email,
+                      orElse: () => null,
+                    );
+
+                    if (tecnico != null &&
+                        tecnico['password'] == null &&
+                        tecnico['activo'] == true) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CreatePasswordScreen(tecnicoId: tecnico['id']),
+                        ),
+                      );
+                      return;
+                    }
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('No se puede crear la contraseña para este correo')),
+                    );
+                  }
+                },
+                child: const Text('¿Primera vez? Crear contraseña'),
               ),
             ],
           ),

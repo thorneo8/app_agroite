@@ -9,8 +9,14 @@ void main() async {
   await Hive.initFlutter();
   await Hive.openBox('empresas'); // Caja para guardar empresas
   await Hive.openBox('tecnicos'); // Caja para guardar tecnicos
+  await Hive.openBox('clientes'); // Caja para guardar clientes
+  await Hive.openBox('cultivos'); // Caja para guardar cultivos
   runApp(const MyApp());
 }
+
+// En cualquier pantalla:
+final cultivosBox = Hive.box('cultivos');
+final cultivos = cultivosBox.values.toList(); // Lista de cultivos global
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

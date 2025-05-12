@@ -222,7 +222,7 @@ class _FincaFormState extends State<FincaForm> {
             const SizedBox(height: 10),
             TextField(
               decoration: const InputDecoration(labelText: 'Hectáreas'),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
               onChanged: (v) => hectareas = double.tryParse(v),
             ),
           ],

@@ -1,0 +1,140 @@
+[12-May-2025 15:18:51 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'agroqmnv_app'@'localhost' to database 'agroqmnv_app' in /home/agroqmnv/app.agroite.com/config/config.php:9
+Stack trace:
+#0 /home/agroqmnv/app.agroite.com/config/config.php(9): mysqli->__construct()
+#1 /home/agroqmnv/app.agroite.com/api/login.php(6): include_once('/home/agroqmnv/...')
+#2 {main}
+  thrown in /home/agroqmnv/app.agroite.com/config/config.php on line 9
+[12-May-2025 15:19:04 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'agroqmnv_app'@'localhost' to database 'agroqmnv_app' in /home/agroqmnv/app.agroite.com/config/config.php:9
+Stack trace:
+#0 /home/agroqmnv/app.agroite.com/config/config.php(9): mysqli->__construct()
+#1 /home/agroqmnv/app.agroite.com/api/login.php(6): include_once('/home/agroqmnv/...')
+#2 {main}
+  thrown in /home/agroqmnv/app.agroite.com/config/config.php on line 9
+[12-May-2025 15:19:11 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'agroqmnv_app'@'localhost' to database 'agroqmnv_app' in /home/agroqmnv/app.agroite.com/config/config.php:9
+Stack trace:
+#0 /home/agroqmnv/app.agroite.com/config/config.php(9): mysqli->__construct()
+#1 /home/agroqmnv/app.agroite.com/api/login.php(6): include_once('/home/agroqmnv/...')
+#2 {main}
+  thrown in /home/agroqmnv/app.agroite.com/config/config.php on line 9
+[12-May-2025 15:19:50 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'agroqmnv_app'@'localhost' to database 'agroqmnv_app' in /home/agroqmnv/app.agroite.com/config/config.php:9
+Stack trace:
+#0 /home/agroqmnv/app.agroite.com/config/config.php(9): mysqli->__construct()
+#1 /home/agroqmnv/app.agroite.com/api/login.php(6): include_once('/home/agroqmnv/...')
+#2 {main}
+  thrown in /home/agroqmnv/app.agroite.com/config/config.php on line 9
+[12-May-2025 15:20:32 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'agroqmnv_app'@'localhost' to database 'agroqmnv_app' in /home/agroqmnv/app.agroite.com/config/config.php:9
+Stack trace:
+#0 /home/agroqmnv/app.agroite.com/config/config.php(9): mysqli->__construct()
+#1 /home/agroqmnv/app.agroite.com/api/login.php(6): include_once('/home/agroqmnv/...')
+#2 {main}
+  thrown in /home/agroqmnv/app.agroite.com/config/config.php on line 9
+[12-May-2025 15:21:03 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'agroqmnv_app'@'localhost' to database 'agroqmnv_app' in /home/agroqmnv/app.agroite.com/config/config.php:9
+Stack trace:
+#0 /home/agroqmnv/app.agroite.com/config/config.php(9): mysqli->__construct()
+#1 /home/agroqmnv/app.agroite.com/api/login.php(6): include_once('/home/agroqmnv/...')
+#2 {main}
+  thrown in /home/agroqmnv/app.agroite.com/config/config.php on line 9
+[12-May-2025 15:24:58 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'agroqmnv_app'@'localhost' to database 'agroqmnv_app' in /home/agroqmnv/app.agroite.com/config/config.php:9
+Stack trace:
+#0 /home/agroqmnv/app.agroite.com/config/config.php(9): mysqli->__construct()
+#1 /home/agroqmnv/app.agroite.com/api/login.php(6): include_once('/home/agroqmnv/...')
+#2 {main}
+  thrown in /home/agroqmnv/app.agroite.com/config/config.php on line 9
+[12-May-2025 15:25:12 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'agroqmnv_app'@'localhost' to database 'agroqmnv_app' in /home/agroqmnv/app.agroite.com/config/config.php:9
+Stack trace:
+#0 /home/agroqmnv/app.agroite.com/config/config.php(9): mysqli->__construct()
+#1 /home/agroqmnv/app.agroite.com/api/login.php(6): include_once('/home/agroqmnv/...')
+#2 {main}
+  thrown in /home/agroqmnv/app.agroite.com/config/config.php on line 9
+[12-May-2025 15:31:00 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'agroqmnv_app'@'localhost' to database 'agroqmnv_app' in /home/agroqmnv/app.agroite.com/config/config.php:9
+Stack trace:
+#0 /home/agroqmnv/app.agroite.com/config/config.php(9): mysqli->__construct()
+#1 /home/agroqmnv/app.agroite.com/api/test_db.php(2): include_once('/home/agroqmnv/...')
+#2 {main}
+  thrown in /home/agroqmnv/app.agroite.com/config/config.php on line 9
+[12-May-2025 15:31:10 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Access denied for user 'agroqmnv_app'@'localhost' to database 'agroqmnv_app' in /home/agroqmnv/app.agroite.com/config/config.php:9
+Stack trace:
+#0 /home/agroqmnv/app.agroite.com/config/config.php(9): mysqli->__construct()
+#1 /home/agroqmnv/app.agroite.com/api/test_db.php(2): include_once('/home/agroqmnv/...')
+#2 {main}
+  thrown in /home/agroqmnv/app.agroite.com/config/config.php on line 9
+[12-May-2025 15:44:53 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 18
+[12-May-2025 15:45:15 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 18
+[12-May-2025 15:47:54 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 18
+[12-May-2025 15:48:04 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 18
+[12-May-2025 15:48:05 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 18
+[12-May-2025 15:48:05 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 18
+[12-May-2025 15:48:05 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 18
+[12-May-2025 15:48:05 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 18
+[12-May-2025 15:48:06 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 18
+[12-May-2025 15:48:06 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 18
+[12-May-2025 15:48:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 18
+[12-May-2025 15:53:14 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 18
+[12-May-2025 15:53:15 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 18
+[12-May-2025 15:58:38 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login_debug.php:32
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login_debug.php on line 32
+[12-May-2025 15:59:59 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login_debug.php:32
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login_debug.php on line 32
+[12-May-2025 16:00:15 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login_debug.php:32
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login_debug.php on line 32
+[12-May-2025 16:06:23 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login_debug_usuario.php:32
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login_debug_usuario.php on line 32
+[13-May-2025 11:47:28 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:43
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 43
+[13-May-2025 14:08:11 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:52
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 52
+[13-May-2025 14:08:26 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli_stmt::get_result() in /home/agroqmnv/app.agroite.com/api/login.php:52
+Stack trace:
+#0 {main}
+  thrown in /home/agroqmnv/app.agroite.com/api/login.php on line 52

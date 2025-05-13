@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Login por Usuario</title>
+</head>
+<body>
+    <h2>Probar Login por Usuario</h2>
+    <form id="loginForm">
+        <label for="usuario">Nombre de Usuario:</label><br>
+        <input type="text" name="usuario" id="usuario" value="Supremo"><br><br>
+        
+        <label for="password">Contraseña:</label><br>
+        <input type="password" name="password" id="password" value="Supremo.2024!admin"><br><br>
+
+        <input type="submit" value="Probar Login">
+    </form>
+
+    <h3>Resultado:</h3>
+    <pre id="resultado"></pre>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const resultado = document.getElementById('resultado');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const response = await fetch('https://app.agroite.com/api/login_debug_usuario_raw.php', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.text();
+            resultado.textContent = data;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+<?php
+// Página de login
+?>

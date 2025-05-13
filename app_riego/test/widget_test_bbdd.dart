@@ -18,12 +18,12 @@ void main() {
     final db = DatabaseService();
 
     // Inserta una empresa de prueba
-    await db.insertEmpresa({
-      'nombre': 'Empresa Test',
-      'email': 'test@empresa.com',
-      'telefono': '123456789',
-      'password': 'secreto',
-    });
+    await db.registerEmpresa(
+      nombre: 'Empresa Test',
+      email: 'test@empresa.com',
+      telefono: '123456789',
+      password: 'secreto',
+    );
 
     // Lee las empresas
     final empresas = await db.getEmpresas();

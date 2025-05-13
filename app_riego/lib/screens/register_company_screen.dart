@@ -57,12 +57,12 @@ class RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                   if (!_formKey.currentState!.validate()) return;
                   _formKey.currentState!.save();
 
-                  await DatabaseService().insertEmpresa({
-                    'nombre': companyName,
-                    'email': email,
-                    'telefono': phone,
-                    'password': password,
-                  });
+                  await DatabaseService().registerEmpresa(
+                    nombre: companyName,
+                    email: email,
+                    telefono: phone,
+                    password: password,
+                  );
 
                   final empresas = await DatabaseService().getEmpresas();
                   // ignore: avoid_print

@@ -2,7 +2,7 @@ name: app_riego
 description: A new Flutter project.
 
 environment: 
-  sdk: ' >=3.7.0 <4.0.0'
+  sdk: '>=3.7.0 <4.0.0'
   
 dependencies:
   flutter:
@@ -12,16 +12,18 @@ dependencies:
   hive_flutter: ^1.1.0
   uuid: ^4.0.0
   flutter_gallery_assets: any
-  # tus demás dependencias...
   google_fonts: ^6.1.0
   intl: ^0.19.0
   http: ^1.2.1
   flutter_localizations:
     sdk: flutter
   logger: ^2.0.2
+  path_provider: ^2.0.0
+  provider: ^6.1.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
-
+  build_runner: ^2.4.0
+  hive_generator: ^1.1.0

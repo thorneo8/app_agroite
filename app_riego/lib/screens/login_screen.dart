@@ -1,154 +1,103 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'company_dashboard_screen.dart';
-import 'create_password_screen.dart';
-import 'technician_dashboard_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:app_riego/services/api_service.dart';
+import 'package:app_riego/screens/company_dashboard_screen.dart';
+import 'package:app_riego/screens/technician_dashboard_screen.dart';
+import 'package:app_riego/screens/client_dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
-
   @override
-  LoginScreenState createState() => LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  String email = '';
-  String password = '';
+  String _email    = '';
+  String _password = '';
+  bool _loading    = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Iniciar Sesión')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Email'),
-                validator: (value) {
-                  if (value == null || !value.contains('@')) {
-                    return 'Ingrese un email válido';
-                  }
-                  return null;
-                },
-                onSaved: (value) => email = value!,
+                keyboardType: TextInputType.emailAddress,
+                validator: (v) =>
+                    (v == null || !v.contains('@')) ? 'Email inválido' : null,
+                onSaved: (v) => _email = v!.trim(),
               ),
+              const SizedBox(height: 16),
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Contraseña'),
                 obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Ingrese su contraseña';
-                  }
-                  return null;
-                },
-                onSaved: (value) => password = value!,
+                validator: (v) =>
+                    (v == null || v.isEmpty) ? 'Ingrese contraseña' : null,
+                onSaved: (v) => _password = v!.trim(),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-
-                    final empresasBox = Hive.box('empresas');
-                    final tecnicosBox = Hive.box('tecnicos');
-
-                    final empresa = empresasBox.values.firstWhere(
-                      (e) => e['email'] == email && e['password'] == password,
-                      orElse: () => null,
-                    );
-
-                    if (empresa != null) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CompanyDashboardScreen(),
-                        ),
-                      );
-                      return;
-                    }
-
-                    final tecnico = tecnicosBox.values.firstWhere(
-                      (t) => t['email'] == email,
-                      orElse: () => null,
-                    );
-
-                    if (tecnico != null) {
-                      if (tecnico['activo'] != true) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Usuario desactivado. Contacte con su empresa.')),
-                        );
-                        return;
-                      }
-
-                      if (tecnico['password'] == null) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CreatePasswordScreen(tecnicoId: tecnico['id']),
-                          ),
-                        );
-                        return;
-                      }
-
-                      if (tecnico['password'] == password) {
-                        // Redirige al dashboard del técnico
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const TechnicianDashboardScreen(),
-                          ),
-                        );
-                        return;
-                      }
-                    }
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Credenciales incorrectas')),
-                    );
-                  }
-                },
-                child: const Text('Entrar'),
-              ),
-              const SizedBox(height: 10),
-              TextButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-
-                    final tecnicosBox = Hive.box('tecnicos');
-                    final tecnico = tecnicosBox.values.firstWhere(
-                      (t) => t['email'] == email,
-                      orElse: () => null,
-                    );
-
-                    if (tecnico != null &&
-                        tecnico['password'] == null &&
-                        tecnico['activo'] == true) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CreatePasswordScreen(tecnicoId: tecnico['id']),
-                        ),
-                      );
-                      return;
-                    }
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('No se puede crear la contraseña para este correo')),
-                    );
-                  }
-                },
-                child: const Text('¿Primera vez? Crear contraseña'),
-              ),
+              const SizedBox(height: 24),
+              _loading
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: _submit,
+                      child: const Text('Entrar'),
+                    ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    _formKey.currentState!.save();
+    setState(() => _loading = true);
+
+    try {
+      final api = Provider.of<ApiService>(context, listen: false);
+      final user = await api.loginGeneral(email: _email, password: _password);
+
+      if (!mounted) return;
+      switch (user['role'] as String) {
+        case 'empresa':
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const CompanyDashboardScreen()),
+          );
+          break;
+        case 'tecnico':
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const TechnicianDashboardScreen()),
+          );
+          break;
+        case 'cliente':
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ClientDashboardScreen(clientData: user),
+            ),
+          );
+          break;
+        default:
+          throw Exception('Rol desconocido: ${user['role']}');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error de login: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 }

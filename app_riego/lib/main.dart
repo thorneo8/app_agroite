@@ -1,26 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'screens/register_company_screen.dart';
-import 'screens/login_screen.dart';
+import 'package:app_riego/models/empresa.dart';
+import 'package:app_riego/services/api_service.dart';
+import 'package:app_riego/screens/register_company_screen.dart';
+import 'package:app_riego/screens/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  await Hive.openBox('empresas'); // Caja para guardar empresas
-  await Hive.openBox('tecnicos'); // Caja para guardar tecnicos
-  await Hive.openBox('clientes'); // Caja para guardar clientes
-  await Hive.openBox('cultivos'); // Caja para guardar cultivos
-  runApp(const MyApp());
-}
 
-// En cualquier pantalla:
-final cultivosBox = Hive.box('cultivos');
-final cultivos = cultivosBox.values.toList(); // Lista de cultivos global
+  // Registrar adapters de Hive
+  Hive.registerAdapter(EmpresaAdapter());
+  // Hive.registerAdapter(TecnicoAdapter());
+  // Hive.registerAdapter(ClienteAdapter());
+  // ... registra aquí el resto cuando los crees
+
+  // Abrir cajas
+  await Hive.openBox<Empresa>('empresas');
+  await Hive.openBox('tecnicos');
+  await Hive.openBox('clientes');
+  await Hive.openBox('cultivos');
+
+  // Inyectar ApiService y arrancar la app
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<ApiService>(create: (_) => ApiService()),
+      ],
+      child: const MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -39,7 +55,7 @@ class LandingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea( // ✅ Hemos añadido SafeArea aquí para mejorar la interacción en iOS
+      body: SafeArea(
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24.0),

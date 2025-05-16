@@ -3,6 +3,8 @@
 ## Comandos Git
 
 ```bash
+## Comandos Git
+
 git status
 git add .
 git commit -m "mensaje"

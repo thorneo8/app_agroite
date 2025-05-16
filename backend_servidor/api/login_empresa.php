@@ -1,57 +1,39 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+// api/login_empresa.php
 
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: POST");
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Content-Type');
 
-include_once("../config/config.php");
+require_once __DIR__ . '/../config/config.php';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['status'=>'error','message'=>'Método no permitido']);
-    exit;
-}
+$data = json_decode(file_get_contents('php://input'), true);
 
-$input = json_decode(file_get_contents('php://input'), true);
-$email    = trim($input['email']    ?? '');
-$password = trim($input['password'] ?? '');
-
-if (!$email || !$password) {
+if (empty($data['email']) || empty($data['password'])) {
     http_response_code(400);
-    echo json_encode(['status'=>'error','message'=>'Faltan datos']);
+    echo json_encode(['error' => 'Faltan email o password']);
     exit;
 }
 
-$stmt = $conn->prepare("SELECT id, nombre, password_hash FROM empresas WHERE email = ?");
-if (!$stmt) {
-    http_response_code(500);
-    echo json_encode(['status'=>'error','message'=>'Error al preparar la consulta']);
-    exit;
-}
-$stmt->bind_param("s", $email);
+// Buscamos el registro por email
+$stmt = $conn->prepare("SELECT id, nombre, razon_social, cif, email, password_hash FROM empresas WHERE email = ?");
+$stmt->bind_param('s', $data['email']);
 $stmt->execute();
-$stmt->bind_result($id, $nombre, $hash);
+$result = $stmt->get_result();
 
-if ($stmt->fetch()) {
-    if (password_verify($password, $hash)) {
-        echo json_encode([
-            'status'=>'success',
-            'user' => [
-                'id'     => $id,
-                'nombre' => $nombre,
-                'email'  => $email
-            ]
-        ]);
+if ($row = $result->fetch_assoc()) {
+    if (password_verify($data['password'], $row['password_hash'])) {
+        // Eliminamos el password_hash de la respuesta
+        unset($row['password_hash']);
+        echo json_encode($row);
     } else {
         http_response_code(401);
-        echo json_encode(['status'=>'error','message'=>'Contraseña incorrecta']);
+        echo json_encode(['error' => 'Contraseña incorrecta']);
     }
 } else {
     http_response_code(404);
-    echo json_encode(['status'=>'error','message'=>'Empresa no encontrada']);
+    echo json_encode(['error' => 'Empresa no encontrada']);
 }
 
-$stmt->close();
-?>
+$conn->close();

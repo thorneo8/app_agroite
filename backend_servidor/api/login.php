@@ -1,78 +1,83 @@
 <?php
-// Mostrar errores en depuración
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// api/login.php
 
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: POST");
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Content-Type');
 
-include_once("../config/config.php");
+require_once __DIR__ . '/../config/config.php';
 
-// 1. Sólo POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['status'=>'error','message'=>'Método no permitido']);
-    exit;
-}
+$data = json_decode(file_get_contents('php://input'), true);
+$email    = $data['email']    ?? '';
+$password = $data['password'] ?? '';
 
-// 2. Conexión OK?
-if (!isset($conn) || $conn->connect_errno) {
-    http_response_code(500);
-    echo json_encode([
-      'status'=>'error',
-      'message'=>'Error en conexión DB: ' . ($conn->connect_error ?? 'desconocido')
-    ]);
-    exit;
-}
-
-// 3. Leer JSON
-$input = json_decode(file_get_contents('php://input'), true);
-$usuario  = trim($input['usuario']  ?? '');
-$password = trim($input['password'] ?? '');
-if (!$usuario || !$password) {
+if (empty($email) || empty($password)) {
     http_response_code(400);
-    echo json_encode(['status'=>'error','message'=>'Faltan campos']);
+    echo json_encode(['error'=>'Faltan email o password']);
     exit;
 }
 
-// 4. Preparar consulta
-$stmt = $conn->prepare(
-    "SELECT id, nombre, password 
-       FROM admin_supremo 
-      WHERE nombre = ?"
-);
-if (!$stmt) {
-    http_response_code(500);
-    echo json_encode(['status'=>'error','message'=>'Error al preparar consulta']);
-    exit;
-}
-$stmt->bind_param("s", $usuario);
-
-// 5. Ejecutar y enlazar resultados
-if (!$stmt->execute()) {
-    http_response_code(500);
-    echo json_encode(['status'=>'error','message'=>'Error al ejecutar consulta']);
-    exit;
-}
-$stmt->bind_result($id, $nombre_db, $hashed_password);
-
-// 6. Comprobar filas
-if ($stmt->fetch()) {
-    // 7. Verificar contraseña
-    if (password_verify($password, $hashed_password)) {
-        echo json_encode([
-            'status' => 'success',
-            'user'   => ['id'=>$id,'nombre'=>$nombre_db]
-        ]);
+// 1) Intentamos en empresas
+$stmt = $conn->prepare("SELECT id, nombre, razon_social, cif, email, password_hash FROM empresas WHERE email=?");
+$stmt->bind_param('s',$email);
+$stmt->execute();
+$res = $stmt->get_result();
+if ($row = $res->fetch_assoc()) {
+    if (password_verify($password,$row['password_hash'])) {
+        unset($row['password_hash']);
+        $row['role'] = 'empresa';
+        echo json_encode($row);
+        exit;
     } else {
         http_response_code(401);
-        echo json_encode(['status'=>'error','message'=>'Contraseña incorrecta']);
+        echo json_encode(['error'=>'Contraseña incorrecta']);
+        exit;
     }
-} else {
-    http_response_code(404);
-    echo json_encode(['status'=>'error','message'=>'Usuario no encontrado']);
 }
 
-$stmt->close();
+// 2) Intentamos en técnicos
+$stmt = $conn->prepare("SELECT id, empresa_id, nombre_apellido, email, telefono, password_hash, activo FROM tecnicos WHERE email=?");
+$stmt->bind_param('s',$email);
+$stmt->execute();
+$res = $stmt->get_result();
+if ($row = $res->fetch_assoc()) {
+    if (!$row['activo']) {
+        http_response_code(403);
+        echo json_encode(['error'=>'Técnico desactivado']);
+        exit;
+    }
+    if (password_verify($password,$row['password_hash'])) {
+        unset($row['password_hash']);
+        $row['role'] = 'tecnico';
+        echo json_encode($row);
+        exit;
+    } else {
+        http_response_code(401);
+        echo json_encode(['error'=>'Contraseña incorrecta']);
+        exit;
+    }
+}
+
+// 3) Intentamos en clientes
+$stmt = $conn->prepare("SELECT id, empresa_id, tecnico_id, nombre_apellido, email, telefono, password_hash, ubicacion FROM clientes WHERE email=?");
+$stmt->bind_param('s',$email);
+$stmt->execute();
+$res = $stmt->get_result();
+if ($row = $res->fetch_assoc()) {
+    if (password_verify($password,$row['password_hash'])) {
+        unset($row['password_hash']);
+        $row['role'] = 'cliente';
+        echo json_encode($row);
+        exit;
+    } else {
+        http_response_code(401);
+        echo json_encode(['error'=>'Contraseña incorrecta']);
+        exit;
+    }
+}
+
+// Si no se encontró en ninguna tabla
+http_response_code(404);
+echo json_encode(['error'=>'Usuario no encontrado']);
+$conn->close();

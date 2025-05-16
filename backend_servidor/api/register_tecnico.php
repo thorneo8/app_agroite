@@ -1,5 +1,5 @@
 <?php
-// api/register_empresa.php
+// api/register_tecnico.php
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -10,41 +10,35 @@ require_once __DIR__ . '/../config/config.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-// Validamos solo los campos estrictamente necesarios
 if (
-    empty($data['nombre']) ||
+    empty($data['empresa_id']) ||
+    empty($data['nombre_apellido']) ||
     empty($data['email']) ||
+    empty($data['telefono']) ||
     empty($data['password'])
 ) {
     http_response_code(400);
-    echo json_encode(['error' => 'Faltan datos obligatorios: nombre, email y password']);
+    echo json_encode(['error' => 'Faltan datos obligatorios']);
     exit;
 }
 
-// Si no vienen, dejamos cif y razon_social como cadena vacía
-$razon_social = $data['razon_social'] ?? '';
-$cif          = $data['cif']          ?? '';
-
 $stmt = $conn->prepare(
-    "INSERT INTO empresas (nombre, razon_social, cif, email, password_hash)
+    "INSERT INTO tecnicos (empresa_id, nombre_apellido, email, telefono, password_hash)
      VALUES (?, ?, ?, ?, ?)"
 );
 $hash = password_hash($data['password'], PASSWORD_BCRYPT);
 $stmt->bind_param(
-    'sssss',
-    $data['nombre'],
-    $razon_social,
-    $cif,
+    'issss',
+    $data['empresa_id'],
+    $data['nombre_apellido'],
     $data['email'],
+    $data['telefono'],
     $hash
 );
 
 if ($stmt->execute()) {
     http_response_code(201);
-    echo json_encode([
-        'success' => true,
-        'id'      => $stmt->insert_id
-    ]);
+    echo json_encode(['success' => true, 'id' => $stmt->insert_id]);
 } else {
     http_response_code(500);
     echo json_encode(['error' => $stmt->error]);

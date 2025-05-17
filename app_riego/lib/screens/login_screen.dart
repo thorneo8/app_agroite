@@ -1,21 +1,26 @@
+// lib/screens/login_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app_riego/services/api_service.dart';
+import 'package:app_riego/models/empresa.dart';
 import 'package:app_riego/screens/company_dashboard_screen.dart';
 import 'package:app_riego/screens/technician_dashboard_screen.dart';
 import 'package:app_riego/screens/client_dashboard_screen.dart';
+import 'package:app_riego/screens/create_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  String _email    = '';
+  String _email = '';
   String _password = '';
-  bool _loading    = false;
+  bool _loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +54,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: _submit,
                       child: const Text('Entrar'),
                     ),
+              // Agrega aquí el botón para crear contraseña
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const CreatePasswordScreen(),
+                    ),
+                  );
+                },
+                child: const Text('¿Primera vez? Crea tu contraseña'),
+              ),
             ],
           ),
         ),
@@ -63,22 +80,35 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final api = Provider.of<ApiService>(context, listen: false);
-      final user = await api.loginGeneral(email: _email, password: _password);
+      final user = await api.loginGeneral(
+        email: _email,
+        password: _password,
+      );
 
       if (!mounted) return;
-      switch (user['role'] as String) {
+      final role = user['role'] as String;
+
+      switch (role) {
         case 'empresa':
+          // Convertimos el JSON a Empresa y pasamos al dashboard
+          final empresa = Empresa.fromJson(user);
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const CompanyDashboardScreen()),
+            MaterialPageRoute(
+              builder: (_) => CompanyDashboardScreen(empresa: empresa),
+            ),
           );
           break;
+
         case 'tecnico':
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const TechnicianDashboardScreen()),
+            MaterialPageRoute(
+              builder: (_) => const TechnicianDashboardScreen(),
+            ),
           );
           break;
+
         case 'cliente':
           Navigator.pushReplacement(
             context,
@@ -87,8 +117,9 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
           break;
+
         default:
-          throw Exception('Rol desconocido: ${user['role']}');
+          throw Exception('Rol desconocido: $role');
       }
     } catch (e) {
       if (mounted) {

@@ -1,107 +1,83 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:uuid/uuid.dart';
+import 'package:provider/provider.dart';
+import 'package:app_riego/services/api_service.dart';
+import 'package:app_riego/screens/register_technician_screen.dart';
 
 class ManageTechniciansScreen extends StatefulWidget {
-  const ManageTechniciansScreen({super.key});
+  final int empresaId;
+  const ManageTechniciansScreen({super.key, required this.empresaId});
 
   @override
-  State<ManageTechniciansScreen> createState() => _ManageTechniciansScreenState();
+  State<ManageTechniciansScreen> createState() =>
+      _ManageTechniciansScreenState();
 }
 
 class _ManageTechniciansScreenState extends State<ManageTechniciansScreen> {
-  late Box techniciansBox;
+  late Future<List<Map<String, dynamic>>> _tecnicosFuture;
 
   @override
   void initState() {
     super.initState();
-    techniciansBox = Hive.box('tecnicos');
+    _loadTecnicos();
   }
 
-  void addTechnician(String nombre, String email, String telefono, String empresaId) {
-    final id = const Uuid().v4();
-    final tecnico = {
-      'id': id,
-      'nombre': nombre,
-      'email': email,
-      'telefono': telefono,
-      'empresaId': empresaId,
-      'activo': true,
-      'password': null,
-    };
-    techniciansBox.put(id, tecnico);
-    setState(() {});
-  }
-
-  void toggleActivo(String id, bool current) {
-    final tecnico = Map<String, dynamic>.from(techniciansBox.get(id));
-    tecnico['activo'] = !current;
-    techniciansBox.put(id, tecnico);
-    setState(() {});
+  void _loadTecnicos() {
+    _tecnicosFuture = Provider.of<ApiService>(context, listen: false)
+        .fetchTecnicos(empresaId: widget.empresaId);
   }
 
   @override
   Widget build(BuildContext context) {
-    final tecnicos = techniciansBox.toMap().values.toList().cast<Map>();
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Gestionar Técnicos'),
-      ),
-      body: ListView.builder(
-        itemCount: tecnicos.length,
-        itemBuilder: (context, index) {
-          final tecnico = tecnicos[index];
-          return ListTile(
-            title: Text(tecnico['nombre'] ?? ''),
-            subtitle: Text(tecnico['email'] ?? ''),
-            trailing: Switch(
-              value: tecnico['activo'] ?? false,
-              onChanged: (_) => toggleActivo(tecnico['id'], tecnico['activo']),
-            ),
+      appBar: AppBar(title: const Text('Gestionar Técnicos')),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _tecnicosFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final tecnicos = snapshot.data!;
+          if (tecnicos.isEmpty) {
+            return const Center(child: Text('No hay técnicos aún'));
+          }
+          return ListView.builder(
+            itemCount: tecnicos.length,
+            itemBuilder: (context, i) {
+              final t = tecnicos[i];
+              return ListTile(
+                title: Text(t['nombre_apellido'] ?? 'Sin nombre'),
+                subtitle: Text(t['email'] ?? ''),
+                trailing: Switch(
+                  value: t['activo'] == true,
+                  onChanged: (_) {
+                    // Si quieres manejar activo/inactivo, hazlo por API y luego recarga:
+                    // await api.toggleTecnicoActivo(...);
+                    // _loadTecnicos(); setState((){});
+                  },
+                ),
+              );
+            },
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (_) {
-              final nombreController = TextEditingController();
-              final emailController = TextEditingController();
-              final telefonoController = TextEditingController();
-
-              return AlertDialog(
-                title: const Text('Nuevo Técnico'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(controller: nombreController, decoration: const InputDecoration(labelText: 'Nombre')),
-                    TextField(controller: emailController, decoration: const InputDecoration(labelText: 'Email')),
-                    TextField(controller: telefonoController, decoration: const InputDecoration(labelText: 'Teléfono')),
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancelar'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      addTechnician(
-                        nombreController.text,
-                        emailController.text,
-                        telefonoController.text,
-                        'empresa-001', // Temporal
-                      );
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Guardar'),
-                  ),
-                ],
-              );
-            },
+        onPressed: () async {
+          // Navegamos a la pantalla de crear técnico y esperamos el nuevo ID
+          final nuevoId = await Navigator.push<String>(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  RegisterTechnicianScreen(empresaId: widget.empresaId),
+            ),
           );
+          if (nuevoId != null) {
+            // Tras volver, recargamos la lista
+            _loadTecnicos();
+            setState(() {});
+          }
         },
         child: const Icon(Icons.add),
       ),

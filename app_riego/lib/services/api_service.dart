@@ -6,40 +6,32 @@ import 'package:hive/hive.dart';
 import 'package:app_riego/models/empresa.dart';
 
 class ApiService {
-  // Ruta base de tu API
   final String baseUrl = 'https://app.agroite.com/api';
-
-  // Caja Hive para Empresas
   late final Box<Empresa> empresaBox;
 
   ApiService() {
     empresaBox = Hive.box<Empresa>('empresas');
   }
 
-  /// 1) Obtener lista de empresas (online / offline)
   Future<List<Empresa>> fetchEmpresas() async {
     try {
-      final uri = Uri.parse('$baseUrl/empresas.php');
-      final resp = await http.get(uri);
+      final resp = await http.get(Uri.parse('$baseUrl/empresas.php'));
       if (resp.statusCode == 200) {
         final List data = jsonDecode(resp.body);
-        final empresas = data.map((e) => Empresa.fromJson(e)).toList();
-        // Sincronizar local
+        final list = data.map((e) => Empresa.fromJson(e)).toList();
         await empresaBox.clear();
-        for (var emp in empresas) {
-          empresaBox.put(emp.id, emp);
+        for (var e in list) {
+          empresaBox.put(e.id, e);
         }
-        return empresas;
-      } else {
-        throw Exception('Error al cargar empresas: ${resp.statusCode}');
+        // Si la lista está vacía, se devuelve la lista de Hive
+        return list;
       }
+      throw Exception('Error ${resp.statusCode}');
     } catch (_) {
-      // Si falla o estamos offline, devolvemos lo de Hive
       return empresaBox.values.toList();
     }
   }
 
-  /// 2) Crear nueva empresa (siempre online)
   Future<Empresa> createEmpresa({
     required String nombre,
     String razonSocial = '',
@@ -47,9 +39,8 @@ class ApiService {
     required String email,
     required String password,
   }) async {
-    final uri = Uri.parse('$baseUrl/register_empresa.php');
     final resp = await http.post(
-      uri,
+      Uri.parse('$baseUrl/register_empresa.php'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'nombre': nombre,
@@ -60,9 +51,9 @@ class ApiService {
       }),
     );
     if (resp.statusCode == 201) {
-      final data = jsonDecode(resp.body);
+      final d = jsonDecode(resp.body);
       final emp = Empresa(
-        id: data['id'],
+        id: d['id'],
         nombre: nombre,
         razonSocial: razonSocial,
         cif: cif,
@@ -70,54 +61,82 @@ class ApiService {
       );
       empresaBox.put(emp.id, emp);
       return emp;
-    } else {
-      throw Exception('Error al crear empresa: ${resp.statusCode}');
     }
+    throw Exception('Error ${resp.statusCode}');
   }
 
-  /// 3) Iniciar sesión de empresa
-  Future<Empresa> loginEmpresa({
-    required String email,
-    required String password,
-  }) async {
-    final uri = Uri.parse('$baseUrl/login_empresa.php');
-    final resp = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-      }),
-    );
-    if (resp.statusCode == 200) {
-      final data = jsonDecode(resp.body);
-      final emp = Empresa.fromJson(data);
-      // Guardar o actualizar en Hive
-      empresaBox.put(emp.id, emp);
-      return emp;
-    } else {
-      final errorMsg = jsonDecode(resp.body)['error'] ?? 'Error ${resp.statusCode}';
-      throw Exception(errorMsg);
-    }
-  }
-
-  /// 4) Login unificado
   Future<Map<String, dynamic>> loginGeneral({
     required String email,
     required String password,
   }) async {
-    final uri = Uri.parse('$baseUrl/login.php');
+    final resp = await http.post(
+      Uri.parse('$baseUrl/login.php'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password}),
+    );
+    if (resp.statusCode == 200 && resp.body.isNotEmpty) {
+      return jsonDecode(resp.body);
+    }
+    final m = resp.body.isNotEmpty
+        ? jsonDecode(resp.body)['error']
+        : 'Sin respuesta JSON';
+    throw Exception(m);
+  }
+
+  /// <-- NUEVO: crear técnico
+  Future<int> createTecnico({
+    required int empresaId,
+    required String nombreApellido,
+    required String email,
+    required String telefono,
+  }) async {
+    final resp = await http.post(
+      Uri.parse('$baseUrl/register_tecnico.php'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'empresa_id': empresaId,
+        'nombre_apellido': nombreApellido,
+        'email': email,
+        'telefono': telefono,
+      }),
+    );
+    if (resp.statusCode == 201) {
+      final d = jsonDecode(resp.body);
+      return d['id'] as int;
+    }
+    final err = jsonDecode(resp.body)['error'] ?? resp.body;
+    throw Exception('Error al crear técnico: $err');
+  }
+
+  /// <-- NUEVO: listar técnicos (opc)
+  Future<List<Map<String, dynamic>>> fetchTecnicos({int? empresaId}) async {
+    final uri = empresaId == null
+        ? Uri.parse('$baseUrl/tecnicos.php')
+        : Uri.parse('$baseUrl/tecnicos.php?empresa_id=$empresaId');
+    final resp = await http.get(uri);
+    if (resp.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(jsonDecode(resp.body));
+    }
+    throw Exception('Error al cargar técnicos: ${resp.statusCode}');
+  }
+    /// 4) Fijar contraseña de técnico (primera vez)
+  Future<void> setTechnicianPassword({
+    required String email,
+    required String password,
+  }) async {
+    final uri = Uri.parse('$baseUrl/set_password_tecnico.php');
     final resp = await http.post(
       uri,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'email': email, 'password': password}),
     );
     if (resp.statusCode == 200) {
-      // Devolvemos todo el JSON: id, role, y demás campos
-      return jsonDecode(resp.body) as Map<String, dynamic>;
+      final j = jsonDecode(resp.body);
+      if (j['success'] == true) return;
+      throw Exception(j['error'] ?? 'Error desconocido');
     } else {
-      final err = jsonDecode(resp.body)['error'] ?? 'Error ${resp.statusCode}';
-      throw Exception(err);
+      final j = resp.body.isNotEmpty ? jsonDecode(resp.body) : {};
+      throw Exception(j['error'] ?? 'Error ${resp.statusCode}');
     }
   }
 }

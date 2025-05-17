@@ -14,8 +14,7 @@ if (
     empty($data['empresa_id']) ||
     empty($data['nombre_apellido']) ||
     empty($data['email']) ||
-    empty($data['telefono']) ||
-    empty($data['password'])
+    empty($data['telefono'])
 ) {
     http_response_code(400);
     echo json_encode(['error' => 'Faltan datos obligatorios']);
@@ -23,25 +22,28 @@ if (
 }
 
 $stmt = $conn->prepare(
-    "INSERT INTO tecnicos (empresa_id, nombre_apellido, email, telefono, password_hash)
-     VALUES (?, ?, ?, ?, ?)"
+    "INSERT INTO tecnicos
+       (empresa_id, nombre_apellido, email, telefono, password_hash)
+     VALUES (?, ?, ?, ?, NULL)"
 );
-$hash = password_hash($data['password'], PASSWORD_BCRYPT);
 $stmt->bind_param(
-    'issss',
+    'isss',
     $data['empresa_id'],
     $data['nombre_apellido'],
     $data['email'],
-    $data['telefono'],
-    $hash
+    $data['telefono']
 );
 
 if ($stmt->execute()) {
     http_response_code(201);
-    echo json_encode(['success' => true, 'id' => $stmt->insert_id]);
+    echo json_encode([
+        'success' => true,
+        'id'      => $stmt->insert_id
+    ]);
 } else {
     http_response_code(500);
     echo json_encode(['error' => $stmt->error]);
 }
 
+$stmt->close();
 $conn->close();
